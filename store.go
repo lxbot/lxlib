@@ -21,9 +21,9 @@ func NewStore(store *plugin.Plugin) (*Store, error) {
 		// NOTE: NOP
 		break
 	default:
-		return nil, errors.New("invalid store")
+		return nil, errors.New("store.Get is not 'func(string) interface{}'")
 	}
-	fn, err = store.Lookup("Get");
+	fn, err = store.Lookup("Set");
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func NewStore(store *plugin.Plugin) (*Store, error) {
 		// NOTE: NOP
 		break
 	default:
-		return nil, errors.New("invalid store")
+		return nil, errors.New("store.Set is not 'func(string, interface{})'")
 	}
 
 	return &Store{store}, nil
