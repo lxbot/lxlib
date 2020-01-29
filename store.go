@@ -1,6 +1,7 @@
 package lxlib
 
 import (
+	"errors"
 	"plugin"
 )
 
@@ -11,15 +12,30 @@ type (
 )
 
 func NewStore(store *plugin.Plugin) (*Store, error) {
-	if _, err := store.Lookup("Get"); err != nil {
+	fn, err := store.Lookup("Get");
+	if err != nil {
 		return nil, err
 	}
-	if _, err := store.Lookup("Set"); err != nil {
+	switch fn.(type) {
+	case func(string) interface{}:
+		// NOTE: NOP
+		break
+	default:
+		return nil, errors.New("invalid store")
+	}
+	fn, err = store.Lookup("Get");
+	if err != nil {
 		return nil, err
 	}
-	return &Store {
-		store: store,
-	}, nil
+	switch fn.(type) {
+	case func(string, interface{}):
+		// NOTE: NOP
+		break
+	default:
+		return nil, errors.New("invalid store")
+	}
+
+	return &Store{store}, nil
 }
 
 func (this *Store) Get(key string) interface{} {
