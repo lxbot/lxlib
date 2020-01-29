@@ -8,13 +8,15 @@ import (
 type (
 	M         = map[string]interface{}
 	LXMessage struct {
-		pack *pack
+		User    User    `json:"user"`
+		Room    Room    `json:"room"`
+		Message Message `json:"message"`
+		Mode    string  `json:"mode"`
 	}
 	pack struct {
 		User    User    `json:"user"`
 		Room    Room    `json:"room"`
 		Message Message `json:"message"`
-		Mode    string  `json:"mode"`
 	}
 	User struct {
 		ID   string `json:"id"`
@@ -45,31 +47,36 @@ func NewLXMessage(msg M) (*LXMessage, error) {
 	if err := json.Unmarshal(t, pack); err != nil {
 		return nil, err
 	}
-	return &LXMessage{pack}, nil
+	return &LXMessage{
+		User: pack.User,
+		Room: pack.Room,
+		Message: pack.Message,
+		Mode: "",
+	}, nil
 }
 
-func (this *LXMessage) Text(text string) *LXMessage {
-	this.pack.Message.Text = text
+func (this *LXMessage) SetText(text string) *LXMessage {
+	this.Message.Text = text
 	return this
 }
 
 func (this *LXMessage) Send() *LXMessage {
-	this.pack.Mode = "send"
+	this.Mode = "send"
 	return this
 }
 
 func (this *LXMessage) Reply() *LXMessage {
-	this.pack.Mode = "reply"
+	this.Mode = "reply"
 	return this
 }
 
 func (this *LXMessage) ToMap() (M, error) {
-	r, err := toMap(this.pack)
+	r, err := toMap(this)
 	if err != nil {
 		return nil, err
 	}
 
-	r["message"].(M)["attachments"], err = toArrayMap(this.pack.Message.Attachments)
+	r["message"].(M)["attachments"], err = toArrayMap(this.Message.Attachments)
 	return r, err
 }
 
