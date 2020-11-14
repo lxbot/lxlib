@@ -12,11 +12,13 @@ type (
 		Room    Room    `json:"room"`
 		Message Message `json:"message"`
 		Mode    string  `json:"mode"`
+		Raw     interface{} `json:"raw"`
 	}
 	pack struct {
 		User    User    `json:"user"`
 		Room    Room    `json:"room"`
 		Message Message `json:"message"`
+		Raw     interface{} `json:"raw"`
 	}
 	User struct {
 		ID   string `json:"id"`
@@ -52,6 +54,7 @@ func NewLXMessage(msg M) (*LXMessage, error) {
 		Room: pack.Room,
 		Message: pack.Message,
 		Mode: "",
+		Raw: pack.Raw,
 	}, nil
 }
 
