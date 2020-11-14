@@ -12,11 +12,15 @@ type (
 		Room    Room    `json:"room"`
 		Message Message `json:"message"`
 		Mode    string  `json:"mode"`
+		Raw     interface{} `json:"raw"`
+
+		shouldKeepAttachments bool
 	}
 	pack struct {
 		User    User    `json:"user"`
 		Room    Room    `json:"room"`
 		Message Message `json:"message"`
+		Raw     interface{} `json:"raw"`
 	}
 	User struct {
 		ID   string `json:"id"`
@@ -52,11 +56,19 @@ func NewLXMessage(msg M) (*LXMessage, error) {
 		Room: pack.Room,
 		Message: pack.Message,
 		Mode: "",
+		Raw: pack.Raw,
+		shouldKeepAttachments: false,
 	}, nil
 }
 
 func (this *LXMessage) SetText(text string) *LXMessage {
 	this.Message.Text = text
+	return this
+}
+
+func (this *LXMessage) SetAttachments(attachments []Attachment) *LXMessage {
+	this.Message.Attachments = attachments
+	this.shouldKeepAttachments = true
 	return this
 }
 
@@ -76,7 +88,11 @@ func (this *LXMessage) ToMap() (M, error) {
 		return nil, err
 	}
 
-	r["message"].(M)["attachments"], err = toArrayMap(this.Message.Attachments)
+	if this.shouldKeepAttachments {
+		r["message"].(M)["attachments"], err = toArrayMap(this.Message.Attachments)
+	} else {
+		r["message"].(M)["attachments"] = []map[string]interface{}{}
+	}
 	return r, err
 }
 
