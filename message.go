@@ -96,6 +96,15 @@ func (this *LXMessage) ToMap() (M, error) {
 	return r, err
 }
 
+func (this *LXMessage) ToSliceMap() ([]M, error) {
+	r, err := this.ToMap()
+	if err != nil {
+		return nil, err
+	}
+
+	return []M{r}, err
+}
+
 func toMap(i interface{}) (M, error) {
 	t, err := json.Marshal(i)
 	if err != nil {
