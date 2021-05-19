@@ -12,7 +12,11 @@ type (
 )
 
 func NewStore(store *plugin.Plugin) (*Store, error) {
-	fn, err := store.Lookup("Get");
+	if store == nil {
+		return nil, errors.New("nil store pointor")
+	}
+
+	fn, err := store.Lookup("Get")
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +27,7 @@ func NewStore(store *plugin.Plugin) (*Store, error) {
 	default:
 		return nil, errors.New("store.Get is not 'func(string) interface{}'")
 	}
-	fn, err = store.Lookup("Set");
+	fn, err = store.Lookup("Set")
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +47,7 @@ func (this *Store) Get(key string) interface{} {
 	return fn.(func(string) interface{})(key)
 }
 
-func (this *Store)  Set(key string, value interface{}) {
+func (this *Store) Set(key string, value interface{}) {
 	fn, _ := this.store.Lookup("Set")
 	fn.(func(string, interface{}))(key, value)
 }
