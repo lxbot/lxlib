@@ -33,7 +33,9 @@ func (this *LxCommon) Listen(event *chan *lxtypes.Event) {
 	for {
 		TraceLog("lxlib.common.Listen()", "start scan")
 		for s.Scan() {
-			b.WriteString(s.Text())
+			t := s.Text()
+			TraceLog("lxlib.common.Listen()", "scanned:", t)
+			b.WriteString(t)
 		}
 		TraceLog("lxlib.common.Listen()", "end scan")
 		if s.Err() == nil {
