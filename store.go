@@ -1,53 +1,53 @@
 package lxlib
 
 import (
-	"errors"
-	"plugin"
+	"github.com/lxbot/lxlib/v2/common"
+	"github.com/lxbot/lxlib/v2/lxtypes"
 )
 
-type (
-	Store struct {
-		store *plugin.Plugin
-	}
-)
-
-func NewStore(store *plugin.Plugin) (*Store, error) {
-	if store == nil {
-		return nil, errors.New("nil store pointor")
-	}
-
-	fn, err := store.Lookup("Get")
-	if err != nil {
-		return nil, err
-	}
-	switch fn.(type) {
-	case func(string) interface{}:
-		// NOTE: NOP
-		break
-	default:
-		return nil, errors.New("store.Get is not 'func(string) interface{}'")
-	}
-	fn, err = store.Lookup("Set")
-	if err != nil {
-		return nil, err
-	}
-	switch fn.(type) {
-	case func(string, interface{}):
-		// NOTE: NOP
-		break
-	default:
-		return nil, errors.New("store.Set is not 'func(string, interface{})'")
-	}
-
-	return &Store{store}, nil
+type Store struct {
+	common  *common.LxCommon
+	eventCh *chan *lxtypes.Event
+	getCh   *chan *lxtypes.KV
+	setCh   *chan *lxtypes.KV
 }
 
-func (this *Store) Get(key string) interface{} {
-	fn, _ := this.store.Lookup("Get")
-	return fn.(func(string) interface{})(key)
+func NewStore() (store *Store, getCh *chan *lxtypes.KV, setCh *chan *lxtypes.KV) {
+	gCh := make(chan *lxtypes.KV)
+	sCh := make(chan *lxtypes.KV)
+	eventCh := make(chan *lxtypes.Event)
+
+	common := common.NewLxCommon()
+	store = &Store{
+		common:  common,
+		eventCh: &eventCh,
+		getCh:   &gCh,
+		setCh:   &sCh,
+	}
+
+	go common.Listen(&eventCh)
+	go store.listen()
+	store.Raw(lxtypes.NewEvent(lxtypes.ReadyEvent, nil))
+
+	return store, &gCh, &sCh
 }
 
-func (this *Store) Set(key string, value interface{}) {
-	fn, _ := this.store.Lookup("Set")
-	fn.(func(string, interface{}))(key, value)
+func (this *Store) listen() {
+	for {
+		eventPtr := <-*this.eventCh
+		switch eventPtr.Event {
+		case lxtypes.GetStorageEvent:
+			*this.getCh <- eventPtr.Payload.(*lxtypes.KV)
+		case lxtypes.SetStorageEvent:
+			*this.setCh <- eventPtr.Payload.(*lxtypes.KV)
+		}
+	}
+}
+
+func (this *Store) Raw(event *lxtypes.Event) {
+	go this.common.Send(event)
+}
+
+func (this *Store) SendGetResult(kv *lxtypes.KV) {
+	go this.common.Send(lxtypes.NewEvent(lxtypes.GetStorageEvent, kv))
 }
