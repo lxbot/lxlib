@@ -21,7 +21,7 @@ type (
 
 func NewScript() (*Script, *chan *lxtypes.Message) {
 	common.TraceLog("(script)", "lxlib.NewScript()", "start")
-	defer common.TraceLog("lxlib.NewScript()", "end")
+	defer common.TraceLog("(script)", "lxlib.NewScript()", "end")
 
 	messageCh := make(chan *lxtypes.Message)
 	eventCh := make(chan *lxtypes.Event)
