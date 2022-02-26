@@ -50,12 +50,10 @@ func (this *Script) listen() {
 
 		eventPtr := <-*this.eventCh
 
-		common.TraceLog("(script)", "lxlib.listen()", "event received")
-
 		switch eventPtr.Event {
 		case lxtypes.IncomingMessageEvent:
 			json := eventPtr.Payload.(json.RawMessage)
-			common.TraceLog("(script)", "lxlib.listen()", "event received", "type:", eventPtr.Event, "json:", json)
+			common.TraceLog("(script)", "lxlib.listen()", "event received", "type:", eventPtr.Event)
 			payload, err := common.FromJSON(json)
 			if err != nil {
 				common.ErrorLog(err)
