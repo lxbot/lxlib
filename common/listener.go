@@ -43,7 +43,7 @@ func (this *LxCommon) Listen(event *chan *lxtypes.Event) {
 }
 
 func (this *LxCommon) Send(message *lxtypes.Event) {
-	m, err := ToMap(message)
+	m, err := ToJSON(message)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	}
@@ -52,7 +52,7 @@ func (this *LxCommon) Send(message *lxtypes.Event) {
 
 func (this *LxCommon) Close() {
 	message := lxtypes.NewEvent(lxtypes.CloseEvent, nil)
-	m, err := ToMap(message)
+	m, err := ToJSON(message)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	}

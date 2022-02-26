@@ -17,3 +17,11 @@ func ToMap(i interface{}) (lxtypes.M, error) {
 	}
 	return r, nil
 }
+
+func ToJSON(i interface{}) (string, error) {
+	j, err := json.Marshal(i)
+	if err != nil {
+		return "", err
+	}
+	return string(j), nil
+}
