@@ -34,7 +34,6 @@ func NewScript() (*Script, *chan *lxtypes.Message) {
 		messageCh: &messageCh,
 	}
 
-	go c.Listen(&eventCh)
 	go script.listen()
 	script.Raw(lxtypes.NewEvent(lxtypes.ReadyEvent, nil))
 
@@ -45,11 +44,18 @@ func (this *Script) listen() {
 	common.TraceLog("lxlib.listen()", "start")
 	defer common.TraceLog("lxlib.listen()", "end")
 
+	go this.common.Listen(this.eventCh)
+
 	for {
+		common.TraceLog("lxlib.listen()", "waiting event...")
+
 		eventPtr := <-*this.eventCh
+
+		common.TraceLog("lxlib.listen()", "event received")
 		switch eventPtr.Event {
 		case lxtypes.IncomingMessageEvent:
 			json := eventPtr.Payload.(json.RawMessage)
+			common.TraceLog("lxlib.listen()", "event received", "type:", eventPtr.Event, "json:", json)
 			payload, err := common.FromJSON(json)
 			if err != nil {
 				common.ErrorLog(err)
@@ -62,9 +68,13 @@ func (this *Script) listen() {
 			}
 			*this.messageCh <- message
 		case lxtypes.GetStorageEvent:
+			common.TraceLog("lxlib.listen()", "event received", "type:", eventPtr.Event)
 			if event, ok := this.events[eventPtr.ID]; ok {
+				common.TraceLog("lxlib.listen()", "found registered event", "id:", eventPtr.ID)
 				*event.eventCh <- eventPtr
 			}
+		default:
+			common.TraceLog("lxlib.listen()", "unknown event received", "type:", eventPtr.Event)
 		}
 	}
 }
