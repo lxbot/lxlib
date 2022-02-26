@@ -28,29 +28,21 @@ func (this *LxCommon) Listen(event *chan *lxtypes.Event) {
 	defer TraceLog("lxlib.common.Listen()", "end")
 
 	s := bufio.NewScanner(os.Stdin)
-	b := strings.Builder{}
-
 	for {
-		TraceLog("lxlib.common.Listen()", "start scan")
 		for s.Scan() {
-			t := s.Text()
-			TraceLog("lxlib.common.Listen()", "scanned:", t)
-			b.WriteString(t)
-		}
-		TraceLog("lxlib.common.Listen()", "end scan")
-		if s.Err() == nil {
-			line := b.String()
-			TraceLog("lxlib.common.Listen()", "line:", line)
+			line := s.Text()
+			TraceLog("lxlib.common.Listen()", "scanned:", line)
+
 			if strings.HasSuffix("{", line) && strings.HasSuffix("}", line) {
 				TraceLog("lxlib.common.Listen()", "stdin seems json. fire onMessage()")
 				this.onMessage(line, event)
 			} else {
 				TraceLog("lxlib.common.Listen()", "skip line")
 			}
-		} else {
+		}
+		if s.Err() != nil {
 			ErrorLog(s.Err())
 		}
-		b.Reset()
 	}
 }
 
