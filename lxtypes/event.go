@@ -24,8 +24,8 @@ const (
 	ReadyEvent           EventType = "ready"
 	OutgoingEvent                  = "outgoning"
 	CloseEvent                     = "close"
-	IncomingMessageEvent           = "outgoing_message"
-	OutgoingMessageEvent           = "incoming_message"
+	IncomingMessageEvent           = "incoming_message"
+	OutgoingMessageEvent           = "outgoing_message"
 	GetStorageEvent                = "get_storage"
 	SetStorageEvent                = "set_storage"
 )
