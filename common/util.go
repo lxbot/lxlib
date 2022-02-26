@@ -2,6 +2,8 @@ package common
 
 import (
 	"encoding/json"
+	"fmt"
+	"os"
 
 	"github.com/lxbot/lxlib/v2/lxtypes"
 )
@@ -24,4 +26,16 @@ func ToJSON(i interface{}) (string, error) {
 		return "", err
 	}
 	return string(j), nil
+}
+
+func FromJSON(i json.RawMessage) (lxtypes.M, error) {
+	var r lxtypes.M
+	if err := json.Unmarshal(i, &r); err != nil {
+		return nil, err
+	}
+	return r, nil
+}
+
+func ErrorLog(a ...interface{}) {
+	fmt.Fprintln(os.Stderr, a...)
 }

@@ -1,6 +1,10 @@
 package lxtypes
 
-import "github.com/rs/xid"
+import (
+	"encoding/json"
+
+	"github.com/rs/xid"
+)
 
 type (
 	Event struct {
@@ -8,11 +12,17 @@ type (
 		Event   EventType   `json:"event"`
 		Payload interface{} `json:"payload"`
 	}
+	StdInOutEvent struct {
+		ID      string          `json:"id"`
+		Event   EventType       `json:"event"`
+		Payload json.RawMessage `json:"payload"`
+	}
 	EventType string
 )
 
 const (
 	ReadyEvent           EventType = "ready"
+	OutgoingEvent                  = "outgoning"
 	CloseEvent                     = "close"
 	IncomingMessageEvent           = "outgoing_message"
 	OutgoingMessageEvent           = "incoming_message"
