@@ -57,7 +57,7 @@ var isTrace bool
 
 func checkIsTrace() bool {
 	if !isTraceChecked {
-		if d, ok := os.LookupEnv("LXBOT_TRACE"); ok && d != "0" {
+		if d, ok := os.LookupEnv("LXLIB_TRACE"); ok && d != "0" {
 			isTrace = true
 		}
 	}
@@ -65,6 +65,7 @@ func checkIsTrace() bool {
 }
 
 func TraceLog(a ...interface{}) {
+	checkIsTrace()
 	if isTrace {
 		t := make([]interface{}, 0)
 		t = append(t, "[TRACE]")
@@ -78,7 +79,7 @@ var isDebug bool
 
 func checkIsDebug() bool {
 	if !isDebugChecked {
-		if d, ok := os.LookupEnv("LXBOT_DEBUG"); ok && d != "0" {
+		if d, ok := os.LookupEnv("LXLIB_TRACE"); ok && d != "0" {
 			isDebug = true
 		}
 		if checkIsTrace() {
@@ -89,6 +90,7 @@ func checkIsDebug() bool {
 }
 
 func DebugLog(a ...interface{}) {
+	checkIsDebug()
 	if isDebug {
 		t := make([]interface{}, 0)
 		t = append(t, "[DEBUG]")
