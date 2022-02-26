@@ -15,23 +15,35 @@ type LxCommon struct {
 }
 
 func NewLxCommon() *LxCommon {
+	TraceLog("lxlib.common.NewLxCommon()", "start")
+	defer TraceLog("lxlib.common.NewLxCommon()", "end")
+
 	return &LxCommon{
 		logger: log.New(os.Stdout, "", 0),
 	}
 }
 
 func (this *LxCommon) Listen(event *chan *lxtypes.Event) {
+	TraceLog("lxlib.common.Listen()", "start")
+	defer TraceLog("lxlib.common.Listen()", "end")
+
 	s := bufio.NewScanner(os.Stdin)
 	b := strings.Builder{}
 
 	for {
+		TraceLog("lxlib.common.Listen()", "start scan")
 		for s.Scan() {
 			b.WriteString(s.Text())
 		}
+		TraceLog("lxlib.common.Listen()", "end scan")
 		if s.Err() == nil {
 			line := b.String()
+			TraceLog("lxlib.common.Listen()", "line:", line)
 			if strings.HasSuffix("{", line) && strings.HasSuffix("}", line) {
+				TraceLog("lxlib.common.Listen()", "stdin seems json. fire onMessage()")
 				this.onMessage(line, event)
+			} else {
+				TraceLog("lxlib.common.Listen()", "skip line")
 			}
 		} else {
 			ErrorLog(s.Err())
@@ -41,6 +53,9 @@ func (this *LxCommon) Listen(event *chan *lxtypes.Event) {
 }
 
 func (this *LxCommon) onMessage(line string, event *chan *lxtypes.Event) {
+	TraceLog("lxlib.common.onMessage()", "start")
+	defer TraceLog("lxlib.common.onMessage()", "end")
+
 	d := json.NewDecoder(os.Stdin)
 	var data lxtypes.StdInOutEvent
 
@@ -50,25 +65,33 @@ func (this *LxCommon) onMessage(line string, event *chan *lxtypes.Event) {
 	}
 	message := lxtypes.NewEvent(data.Event, data.Payload)
 	message.ID = data.ID
-	if err != nil {
-		ErrorLog(err)
-	}
+	TraceLog("lxlib.common.onMessage()", "event:", message)
 	*event <- message
 }
 
 func (this *LxCommon) Send(message *lxtypes.Event) {
+	TraceLog("lxlib.common.Send()", "start")
+	defer TraceLog("lxlib.common.Send()", "end")
+
 	m, err := ToJSON(message)
 	if err != nil {
 		ErrorLog(err)
+		return
 	}
+	TraceLog("lxlib.common.Send()", "json:", m)
 	this.logger.Println(m)
 }
 
 func (this *LxCommon) Close() {
+	TraceLog("lxlib.common.Close()", "start")
+	defer TraceLog("lxlib.common.Close()", "end")
+
 	message := lxtypes.NewEvent(lxtypes.CloseEvent, nil)
 	m, err := ToJSON(message)
 	if err != nil {
 		ErrorLog(err)
+		return
 	}
+	TraceLog("lxlib.common.Close()", "json:", m)
 	this.logger.Println(m)
 }

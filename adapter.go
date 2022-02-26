@@ -15,14 +15,14 @@ func NewAdapter() (*Adapter, *chan *lxtypes.Message) {
 	messageCh := make(chan *lxtypes.Message)
 	eventCh := make(chan *lxtypes.Event)
 
-	common := common.NewLxCommon()
+	c := common.NewLxCommon()
 	adapter := &Adapter{
-		common:    common,
+		common:    c,
 		eventCh:   &eventCh,
 		messageCh: &messageCh,
 	}
 
-	go common.Listen(&eventCh)
+	go c.Listen(&eventCh)
 	go adapter.listen()
 	adapter.Raw(lxtypes.NewEvent(lxtypes.ReadyEvent, nil))
 

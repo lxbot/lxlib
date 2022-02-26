@@ -17,15 +17,15 @@ func NewStore() (store *Store, getCh *chan *lxtypes.KV, setCh *chan *lxtypes.KV)
 	sCh := make(chan *lxtypes.KV)
 	eventCh := make(chan *lxtypes.Event)
 
-	common := common.NewLxCommon()
+	c := common.NewLxCommon()
 	store = &Store{
-		common:  common,
+		common:  c,
 		eventCh: &eventCh,
 		getCh:   &gCh,
 		setCh:   &sCh,
 	}
 
-	go common.Listen(&eventCh)
+	go c.Listen(&eventCh)
 	go store.listen()
 	store.Raw(lxtypes.NewEvent(lxtypes.ReadyEvent, nil))
 
