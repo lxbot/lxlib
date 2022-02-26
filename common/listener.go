@@ -35,7 +35,7 @@ func (this *LxCommon) Listen(event *chan *lxtypes.Event) {
 
 			if !strings.HasSuffix("{", line) || !strings.HasSuffix("}", line) {
 				TraceLog("lxlib.common.Listen()", "stdin seems json. fire onMessage()")
-				this.onMessage(line, event)
+				this.onMessage(s.Bytes(), event)
 			} else {
 				TraceLog("lxlib.common.Listen()", "malformed event?", "skip line")
 			}
@@ -46,20 +46,18 @@ func (this *LxCommon) Listen(event *chan *lxtypes.Event) {
 	}
 }
 
-func (this *LxCommon) onMessage(line string, event *chan *lxtypes.Event) {
+func (this *LxCommon) onMessage(line []byte, event *chan *lxtypes.Event) {
 	TraceLog("lxlib.common.onMessage()", "start")
 	defer TraceLog("lxlib.common.onMessage()", "end")
 
-	d := json.NewDecoder(os.Stdin)
 	var data lxtypes.StdInOutEvent
-
-	err := d.Decode(&data)
+	err := json.Unmarshal(line, &data)
 	if err != nil {
 		ErrorLog(err)
 	}
 	message := lxtypes.NewEvent(data.Event, data.Payload)
 	message.ID = data.ID
-	TraceLog("lxlib.common.onMessage()", "event:", message)
+	TraceLog("lxlib.common.onMessage()", "event:", message.Event)
 	*event <- message
 }
 
