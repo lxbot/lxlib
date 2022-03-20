@@ -30,7 +30,10 @@ func NewStore() (store *Store, getCh *chan *lxtypes.KV, setCh *chan *lxtypes.KV)
 
 	go c.Listen(&eventCh)
 	go store.listen()
-	store.Raw(lxtypes.NewEvent(lxtypes.ReadyEvent, nil))
+	store.Raw(lxtypes.NewEvent(lxtypes.ReadyEvent, lxtypes.ReadyEventPayload{
+		Mode:     lxtypes.StdIOMode,
+		Endpoint: "",
+	}))
 
 	return store, &gCh, &sCh
 }

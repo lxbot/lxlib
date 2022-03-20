@@ -24,7 +24,10 @@ func NewAdapter() (*Adapter, *chan *lxtypes.Message) {
 
 	go c.Listen(&eventCh)
 	go adapter.listen()
-	adapter.Raw(lxtypes.NewEvent(lxtypes.ReadyEvent, nil))
+	adapter.Raw(lxtypes.NewEvent(lxtypes.ReadyEvent, lxtypes.ReadyEventPayload{
+		Mode:     lxtypes.StdIOMode,
+		Endpoint: "",
+	}))
 
 	return adapter, &messageCh
 }

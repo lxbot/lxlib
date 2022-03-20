@@ -79,7 +79,7 @@ var isDebug bool
 
 func checkIsDebug() bool {
 	if !isDebugChecked {
-		if d, ok := os.LookupEnv("LXLIB_TRACE"); ok && d != "0" {
+		if d, ok := os.LookupEnv("LXLIB_DEBUG"); ok && d != "0" {
 			isDebug = true
 		}
 		if checkIsTrace() {

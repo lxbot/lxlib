@@ -12,12 +12,21 @@ type (
 		Event   EventType   `json:"event"`
 		Payload interface{} `json:"payload"`
 	}
+	ReadyEventPayload struct {
+		Mode     IOMode `json:"mode"`
+		Endpoint string `json:"endpoint"`
+	}
+	IOMode        string
 	StdInOutEvent struct {
 		ID      string          `json:"id"`
 		Event   EventType       `json:"event"`
 		Payload json.RawMessage `json:"payload"`
 	}
 	EventType string
+)
+
+const (
+	StdIOMode IOMode = "stdio"
 )
 
 const (

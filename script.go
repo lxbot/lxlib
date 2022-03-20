@@ -36,7 +36,10 @@ func NewScript() (*Script, *chan *lxtypes.Message) {
 
 	go c.Listen(&eventCh)
 	go script.listen()
-	script.Raw(lxtypes.NewEvent(lxtypes.ReadyEvent, nil))
+	script.Raw(lxtypes.NewEvent(lxtypes.ReadyEvent, lxtypes.ReadyEventPayload{
+		Mode:     lxtypes.StdIOMode,
+		Endpoint: "",
+	}))
 
 	return script, &messageCh
 }
