@@ -11,7 +11,7 @@ type (
 		User     User        `json:"user"`
 		Room     Room        `json:"room"`
 		Contents []Content   `json:"messages"`
-		Mode     string      `json:"mode"`
+		Mode     Mode        `json:"mode"`
 		Raw      interface{} `json:"raw"`
 	}
 	User struct {
@@ -32,6 +32,12 @@ type (
 		Url         string `json:"url"`
 		Description string `json:"description"`
 	}
+	Mode string
+)
+
+const (
+	SendMode  Mode = "send"
+	ReplyMode      = "reply"
 )
 
 func NewLXMessage(msg M) (*Message, error) {
@@ -82,12 +88,12 @@ func (this *Message) AddContent(text string, attachments ...Attachment) *Message
 }
 
 func (this *Message) Send() *Message {
-	this.Mode = "send"
+	this.Mode = SendMode
 	return this
 }
 
 func (this *Message) Reply() *Message {
-	this.Mode = "reply"
+	this.Mode = ReplyMode
 	return this
 }
 
