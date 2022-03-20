@@ -33,7 +33,7 @@ func (this *LxCommon) Listen(event *chan *lxtypes.Event) {
 			line := s.Text()
 			TraceLog("lxlib.common.Listen()", "scanned:", line)
 
-			if strings.HasPrefix("{", line) && strings.HasSuffix("}", line) {
+			if strings.HasPrefix(line, "{") && strings.HasSuffix(line, "}") {
 				TraceLog("lxlib.common.Listen()", "stdin seems json. fire onMessage()")
 				this.onMessage(line, event)
 			} else {
