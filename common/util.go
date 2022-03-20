@@ -45,6 +45,14 @@ func FromJSON(i json.RawMessage) (lxtypes.M, error) {
 	return r, nil
 }
 
+func FatalLog(a ...interface{}) {
+	t := make([]interface{}, 0)
+	t = append(t, "[FATAL]")
+	t = append(t, a...)
+	fmt.Fprintln(os.Stderr, t...)
+	os.Exit(1)
+}
+
 func ErrorLog(a ...interface{}) {
 	t := make([]interface{}, 0)
 	t = append(t, "[ERROR]")
