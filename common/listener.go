@@ -34,7 +34,7 @@ func (this *LxCommon) Listen(event *chan *lxtypes.Event) {
 			TraceLog("lxlib.common.Listen()", "scanned:", line)
 
 			if strings.HasPrefix(line, "{") && strings.HasSuffix(line, "}") {
-				TraceLog("lxlib.common.Listen()", "stdin seems json. fire onMessage()")
+				TraceLog("lxlib.common.Listen()", "stdin seems lxbot message. fire onMessage()")
 				this.onMessage(line, event)
 			} else {
 				TraceLog("lxlib.common.Listen()", "malformed event?", "skip line")
