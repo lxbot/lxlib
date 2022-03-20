@@ -60,6 +60,20 @@ func ErrorLog(a ...interface{}) {
 	fmt.Fprintln(os.Stderr, t...)
 }
 
+func WarnLog(a ...interface{}) {
+	t := make([]interface{}, 0)
+	t = append(t, "[WARN ]")
+	t = append(t, a...)
+	fmt.Fprintln(os.Stderr, t...)
+}
+
+func InfoLog(a ...interface{}) {
+	t := make([]interface{}, 0)
+	t = append(t, "[Info ]")
+	t = append(t, a...)
+	fmt.Fprintln(os.Stderr, t...)
+}
+
 var isTraceChecked bool
 var isTrace bool
 
