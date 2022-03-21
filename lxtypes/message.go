@@ -53,7 +53,7 @@ func NewLXMessage(msg M) (*Message, error) {
 		User:     m.User,
 		Room:     m.Room,
 		Contents: m.Contents,
-		Mode:     "",
+		Mode:     m.Mode,
 		Raw:      m.Raw,
 	}, nil
 }

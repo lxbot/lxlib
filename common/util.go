@@ -69,7 +69,7 @@ func WarnLog(a ...interface{}) {
 
 func InfoLog(a ...interface{}) {
 	t := make([]interface{}, 0)
-	t = append(t, "[Info ]")
+	t = append(t, "[INFO ]")
 	t = append(t, a...)
 	fmt.Fprintln(os.Stderr, t...)
 }
