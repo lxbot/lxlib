@@ -114,6 +114,7 @@ func (this *Script) GetStorage(key string) interface{} {
 	this.events[event.ID] = Event{
 		eventCh: &eventCh,
 	}
+	defer delete(this.events, event.ID)
 	this.Raw(event)
 
 	common.TraceLog("(script)", "lxlib.GetStorage()", "waiting response...")

@@ -1,6 +1,8 @@
 package lxlib
 
 import (
+	"encoding/json"
+
 	"github.com/lxbot/lxlib/v2/common"
 	"github.com/lxbot/lxlib/v2/lxtypes"
 )
@@ -35,9 +37,21 @@ func NewAdapter() (*Adapter, *chan *lxtypes.Message) {
 func (this *Adapter) listen() {
 	for {
 		eventPtr := <-*this.eventCh
+
 		switch eventPtr.Event {
 		case lxtypes.OutgoingMessageEvent:
-			*this.messageCh <- eventPtr.Payload.(*lxtypes.Message)
+			json := eventPtr.Payload.(json.RawMessage)
+			payload, err := common.FromJSON(json)
+			if err != nil {
+				common.ErrorLog(err)
+				continue
+			}
+			message, err := lxtypes.NewLXMessage(payload)
+			if err != nil {
+				common.ErrorLog(err)
+				continue
+			}
+			*this.messageCh <- message
 		}
 	}
 }
