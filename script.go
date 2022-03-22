@@ -121,7 +121,11 @@ func (this *Script) GetStorage(key string) interface{} {
 	common.TraceLog("(script)", "lxlib.GetStorage()", "waiting response...")
 
 	result := <-eventCh
-	payload := result.Payload.(json.RawMessage)
+	json := result.Payload.(json.RawMessage)
+	payload, err := common.FromJSON(json)
+	if err != nil {
+		common.WarnLog(err)
+	}
 	resultKV := new(lxtypes.KV)
 	if err := mapstructure.WeakDecode(payload, resultKV); err != nil {
 		common.WarnLog(err)
