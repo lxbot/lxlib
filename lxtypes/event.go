@@ -48,7 +48,11 @@ func NewEvent(event EventType, payload interface{}) *Event {
 }
 
 func (this *Event) CopyID(copyFrom *Event) {
-	this.ID = copyFrom.ID
+	this.SetID(copyFrom.ID)
+}
+
+func (this *Event) SetID(id string) {
+	this.ID = id
 }
 
 func (this *Event) PayloadAsMap() M {

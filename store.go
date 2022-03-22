@@ -11,16 +11,16 @@ import (
 type Store struct {
 	common  *common.LxCommon
 	eventCh *chan *lxtypes.Event
-	getCh   *chan *lxtypes.KV
-	setCh   *chan *lxtypes.KV
+	getCh   *chan *lxtypes.StoreEvent
+	setCh   *chan *lxtypes.StoreEvent
 }
 
-func NewStore() (store *Store, getCh *chan *lxtypes.KV, setCh *chan *lxtypes.KV) {
+func NewStore() (store *Store, getCh *chan *lxtypes.StoreEvent, setCh *chan *lxtypes.StoreEvent) {
 	common.TraceLog("(store)", "lxlib.NewStore()", "start")
 	defer common.TraceLog("(store)", "lxlib.NewStore()", "end")
 
-	gCh := make(chan *lxtypes.KV)
-	sCh := make(chan *lxtypes.KV)
+	gCh := make(chan *lxtypes.StoreEvent)
+	sCh := make(chan *lxtypes.StoreEvent)
 	eventCh := make(chan *lxtypes.Event)
 
 	c := common.NewLxCommon()
@@ -55,35 +55,27 @@ func (this *Store) listen() {
 		switch eventPtr.Event {
 		case lxtypes.GetStorageEvent:
 			common.TraceLog("(store)", "lxlib.listen()", "event received", "type:", eventPtr.Event)
-			kv := this.eventToKV(eventPtr)
-			if kv != nil {
-				*this.getCh <- kv
-			}
+			*this.getCh <- this.eventToStoreEvent(eventPtr)
 		case lxtypes.SetStorageEvent:
 			common.TraceLog("(store)", "lxlib.listen()", "event received", "type:", eventPtr.Event)
-			kv := this.eventToKV(eventPtr)
-			if kv != nil {
-				*this.setCh <- kv
-			}
+			*this.setCh <- this.eventToStoreEvent(eventPtr)
 		default:
 			common.TraceLog("(store)", "lxlib.listen()", "unknown event received", "type:", eventPtr.Event)
 		}
 	}
 }
 
-func (this *Store) eventToKV(eventPtr *lxtypes.Event) *lxtypes.KV {
+func (this *Store) eventToStoreEvent(eventPtr *lxtypes.Event) *lxtypes.StoreEvent {
 	json := eventPtr.Payload.(json.RawMessage)
 	payload, err := common.FromJSON(json)
 	if err != nil {
 		common.ErrorLog(err)
-		return nil
 	}
 	kv := new(lxtypes.KV)
 	if err := mapstructure.WeakDecode(payload, kv); err != nil {
 		common.ErrorLog(err)
-		return nil
 	}
-	return kv
+	return lxtypes.NewStoreEvent(eventPtr, kv)
 }
 
 func (this *Store) Raw(event *lxtypes.Event) {
@@ -93,10 +85,12 @@ func (this *Store) Raw(event *lxtypes.Event) {
 	go this.common.Send(event)
 }
 
-func (this *Store) SendGetResult(kv *lxtypes.KV) {
+func (this *Store) SendGetResult(event *lxtypes.StoreEvent) {
 	common.TraceLog("(store)", "lxlib.SendGetResult()", "start")
 	defer common.TraceLog("(store)", "lxlib.SendGetResult()", "end")
 
-	common.TraceLog("(store)", "lxlib.SendGetResult()", "payload:", kv)
-	go this.common.Send(lxtypes.NewEvent(lxtypes.GetStorageEvent, kv))
+	common.TraceLog("(store)", "lxlib.SendGetResult()", "payload:", event.KV)
+	ev := lxtypes.NewEvent(lxtypes.GetStorageEvent, event.KV)
+	ev.SetID(event.GetID())
+	go this.common.Send(ev)
 }
