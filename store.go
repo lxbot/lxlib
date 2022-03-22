@@ -1,8 +1,11 @@
 package lxlib
 
 import (
+	"encoding/json"
+
 	"github.com/lxbot/lxlib/v2/common"
 	"github.com/lxbot/lxlib/v2/lxtypes"
+	"github.com/mitchellh/mapstructure"
 )
 
 type Store struct {
@@ -52,14 +55,35 @@ func (this *Store) listen() {
 		switch eventPtr.Event {
 		case lxtypes.GetStorageEvent:
 			common.TraceLog("(store)", "lxlib.listen()", "event received", "type:", eventPtr.Event)
-			*this.getCh <- eventPtr.Payload.(*lxtypes.KV)
+			kv := this.eventToKV(eventPtr)
+			if kv != nil {
+				*this.getCh <- kv
+			}
 		case lxtypes.SetStorageEvent:
 			common.TraceLog("(store)", "lxlib.listen()", "event received", "type:", eventPtr.Event)
-			*this.setCh <- eventPtr.Payload.(*lxtypes.KV)
+			kv := this.eventToKV(eventPtr)
+			if kv != nil {
+				*this.setCh <- kv
+			}
 		default:
 			common.TraceLog("(store)", "lxlib.listen()", "unknown event received", "type:", eventPtr.Event)
 		}
 	}
+}
+
+func (this *Store) eventToKV(eventPtr *lxtypes.Event) *lxtypes.KV {
+	json := eventPtr.Payload.(json.RawMessage)
+	payload, err := common.FromJSON(json)
+	if err != nil {
+		common.ErrorLog(err)
+		return nil
+	}
+	kv := new(lxtypes.KV)
+	if err := mapstructure.WeakDecode(payload, kv); err != nil {
+		common.ErrorLog(err)
+		return nil
+	}
+	return kv
 }
 
 func (this *Store) Raw(event *lxtypes.Event) {
