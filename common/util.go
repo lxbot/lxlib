@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"runtime/debug"
 
 	"github.com/lxbot/lxlib/v2/lxtypes"
 )
@@ -49,6 +50,7 @@ func FatalLog(a ...interface{}) {
 	t := make([]interface{}, 0)
 	t = append(t, "[FATAL]")
 	t = append(t, a...)
+	t = append(t, string(debug.Stack()))
 	fmt.Fprintln(os.Stderr, t...)
 	os.Exit(1)
 }
@@ -57,6 +59,7 @@ func ErrorLog(a ...interface{}) {
 	t := make([]interface{}, 0)
 	t = append(t, "[ERROR]")
 	t = append(t, a...)
+	t = append(t, string(debug.Stack()))
 	fmt.Fprintln(os.Stderr, t...)
 }
 
@@ -64,6 +67,7 @@ func WarnLog(a ...interface{}) {
 	t := make([]interface{}, 0)
 	t = append(t, "[WARN ]")
 	t = append(t, a...)
+	t = append(t, string(debug.Stack()))
 	fmt.Fprintln(os.Stderr, t...)
 }
 
