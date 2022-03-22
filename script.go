@@ -5,6 +5,7 @@ import (
 
 	"github.com/lxbot/lxlib/v2/common"
 	"github.com/lxbot/lxlib/v2/lxtypes"
+	"github.com/mitchellh/mapstructure"
 )
 
 type (
@@ -120,7 +121,15 @@ func (this *Script) GetStorage(key string) interface{} {
 	common.TraceLog("(script)", "lxlib.GetStorage()", "waiting response...")
 
 	result := <-eventCh
-	resultKV := result.Payload.(lxtypes.KV)
+	payload := result.Payload.(json.RawMessage)
+	resultKV := new(lxtypes.KV)
+	if err := mapstructure.WeakDecode(payload, resultKV); err != nil {
+		common.WarnLog(err)
+		resultKV = &lxtypes.KV{
+			Key:   key,
+			Value: nil,
+		}
+	}
 
 	common.TraceLog("(script)", "lxlib.GetStorage()", "response received", "result:", resultKV)
 
