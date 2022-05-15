@@ -8,11 +8,12 @@ import (
 
 type (
 	Message struct {
-		User     User        `json:"user"`
-		Room     Room        `json:"room"`
-		Contents []Content   `json:"messages"`
-		Mode     Mode        `json:"mode"`
-		Raw      interface{} `json:"raw"`
+		User      User        `json:"user"`
+		Room      Room        `json:"room"`
+		Contents  []Content   `json:"messages"`
+		IsMention bool        `json:"is_mention"`
+		Mode      Mode        `json:"mode"`
+		Raw       interface{} `json:"raw"`
 	}
 	User struct {
 		ID   string `json:"id"`
